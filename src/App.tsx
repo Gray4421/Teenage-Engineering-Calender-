@@ -13,7 +13,9 @@ import {
   googleSignIn, 
   logoutGoogle, 
   getAccessToken, 
-  setManualAccessToken 
+  setManualAccessToken,
+  CachedUserProfile,
+  getCachedUserProfile
 } from './services/authService';
 import { TETapeDisplay } from './components/TETapeDisplay';
 import { TEMonthView } from './components/TEMonthView';
@@ -26,9 +28,9 @@ import { useReminderEngine, TEAlarmBanner } from './components/TEAlarmSystem';
 import { teSound } from './utils/sound';
 import { User } from 'firebase/auth';
 import { 
-  Calendar, Plus, Bell, RefreshCw, Volume2, VolumeX, 
-  Radio, AlertCircle, CheckCircle2, Apple, LogOut, KeyRound,
-  Terminal, MonitorDown, Package
+  Plus, RefreshCw, Volume2, VolumeX, 
+  Radio, AlertCircle, Apple, LogOut, KeyRound,
+  Terminal, Package, UserCheck
 } from 'lucide-react';
 
 interface BeforeInstallPromptEvent extends Event {
@@ -37,8 +39,8 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 export default function App() {
-  const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
+  const [user, setUser] = useState<User | CachedUserProfile | null>(() => getCachedUserProfile());
+  const [token, setToken] = useState<string | null>(() => getAccessToken());
   const [isAuthorizing, setIsAuthorizing] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
 
@@ -60,7 +62,7 @@ export default function App() {
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
 
   useEffect(() => {
-    // Load local cache first so events show up immediately
+    // 1. Immediately hydrate events from local cache so the user sees their calendar instantly
     const cached = getLocalCachedEvents();
     if (cached && cached.length > 0) {
       setEvents(cached);
@@ -88,7 +90,7 @@ export default function App() {
     }
   };
 
-  // 1. Initialize Firebase Auth State on startup
+  // 2. Initialize Auth & Auto-Restore previous login session
   useEffect(() => {
     const unsubscribe = initAuth(
       (authedUser, accessToken) => {
@@ -97,15 +99,21 @@ export default function App() {
         setAuthError(null);
       },
       () => {
-        setUser(null);
-        const current = getAccessToken();
-        if (current) setToken(current);
+        const storedToken = getAccessToken();
+        const storedProfile = getCachedUserProfile();
+        if (storedToken) {
+          setToken(storedToken);
+          if (storedProfile) setUser(storedProfile);
+        } else {
+          setUser(null);
+          setToken(null);
+        }
       }
     );
     return () => unsubscribe();
   }, []);
 
-  // 2. Perform official Google Workspace OAuth Sign-in
+  // 3. Perform official Google Workspace OAuth Sign-in
   const handleGoogleSignIn = async () => {
     setIsAuthorizing(true);
     setAuthError(null);
@@ -166,6 +174,7 @@ export default function App() {
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       setSyncError(msg);
+      // If token expired (401), indicate re-auth needed
       if (msg.includes('401')) {
         setToken(null);
       }
@@ -174,6 +183,7 @@ export default function App() {
     }
   };
 
+  // Auto-sync events whenever token is available on visit
   useEffect(() => {
     if (token) {
       refreshEvents();
@@ -277,6 +287,12 @@ export default function App() {
           <span className="bg-[#1e2029] text-[8px] font-mono-te px-1.5 py-0.2 rounded text-[#ff4c00]">
             x86_64-linux-gnu
           </span>
+          {token && (
+            <span className="bg-[#00d2c4]/10 text-[#00d2c4] border border-[#00d2c4]/30 text-[8px] px-1.5 py-0.2 rounded flex items-center gap-1 font-mono-te">
+              <UserCheck size={9} />
+              <span>AUTO-RESTORED</span>
+            </span>
+          )}
         </div>
 
         {/* Linux Window Action Buttons */}
@@ -319,7 +335,7 @@ export default function App() {
               </span>
             </div>
             <span className="text-[9px] text-[#717684] tracking-wider hidden sm:inline">
-              STANDALONE APPLICATION WITH GOOGLE & APPLE CALENDAR BRIDGES (ZERO GEMINI API)
+              AUTOMATIC GOOGLE ACCOUNT PERSISTENCE & LOCAL ENGINE
             </span>
           </div>
         </div>
@@ -344,8 +360,8 @@ export default function App() {
           {token ? (
             <div className="flex items-center gap-2 bg-[#121316] border border-[#2b2e38] px-2.5 py-1 rounded text-[10px] font-mono-te">
               <span className="w-2 h-2 rounded-full bg-[#00d2c4] animate-pulse" />
-              <span className="text-[#a1a6b4] hidden md:inline">
-                {user?.email ? user.email.split('@')[0] : 'GCAL ACTIVE'}
+              <span className="text-[#a1a6b4] hidden md:inline max-w-[130px] truncate" title={user?.email || 'Logged in'}>
+                {user?.email ? user.email.split('@')[0] : 'GOOGLE ACTIVE'}
               </span>
               <button
                 onClick={refreshEvents}
@@ -357,7 +373,7 @@ export default function App() {
               </button>
               <button
                 onClick={handleLogout}
-                className="text-[#6d717f] hover:text-white p-0.5"
+                className="text-[#6d717f] hover:text-[#ff4c00] p-0.5"
                 title="Disconnect Google Account"
               >
                 <LogOut size={11} />
@@ -490,9 +506,9 @@ export default function App() {
           <span>•</span>
           <span>HOST: POSIX / LINUX KERNEL</span>
           <span>•</span>
-          <span>WEBCAL & GOOGLE CAL: ACTIVE</span>
+          <span>SESSION: {token ? 'PERSISTED (AUTO-LOGIN ACTIVE)' : 'OFFLINE LOCAL'}</span>
           <span>•</span>
-          <span>AI / GEMINI: NONE</span>
+          <span>SFX: {soundEnabled ? 'ON' : 'MUTED'}</span>
         </div>
 
         <div className="flex items-center gap-4">
