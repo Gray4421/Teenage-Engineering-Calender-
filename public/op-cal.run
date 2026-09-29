@@ -1,0 +1,28 @@
+#!/bin/bash
+# OP-CAL Native Linux 1-Click Installer
+set -e
+echo "Installing OP-CAL Field Calendar..."
+mkdir -p ~/.local/bin ~/.local/share/applications ~/.local/share/icons/hicolor/scalable/apps
+
+cat << 'DESK' > ~/.local/share/applications/op-cal.desktop
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=OP-CAL Field Calendar
+GenericName=Calendar
+Comment=Teenage Engineering style calendar synthesizer
+Exec=bash -c "google-chrome --app='https://ais-dev-rix33fvhiefnp3k5kqu3b4-475713312881.us-west1.run.app' || chromium --app='https://ais-dev-rix33fvhiefnp3k5kqu3b4-475713312881.us-west1.run.app' || xdg-open 'https://ais-dev-rix33fvhiefnp3k5kqu3b4-475713312881.us-west1.run.app'"
+Icon=op-cal
+Terminal=false
+Categories=Office;Calendar;Utility;
+StartupWMClass=op-cal-field
+DESK
+
+curl -sL "https://ais-dev-rix33fvhiefnp3k5kqu3b4-475713312881.us-west1.run.app/icon.svg" -o ~/.local/share/icons/hicolor/scalable/apps/op-cal.svg 2>/dev/null || true
+
+chmod +x ~/.local/share/applications/op-cal.desktop
+update-desktop-database ~/.local/share/applications/ 2>/dev/null || true
+gtk-update-icon-cache -q ~/.local/share/icons/hicolor 2>/dev/null || true
+
+echo "SUCCESS: OP-CAL is installed to your Ubuntu Application Menu!"
+google-chrome --app="https://ais-dev-rix33fvhiefnp3k5kqu3b4-475713312881.us-west1.run.app" 2>/dev/null || chromium --app="https://ais-dev-rix33fvhiefnp3k5kqu3b4-475713312881.us-west1.run.app" 2>/dev/null || xdg-open "https://ais-dev-rix33fvhiefnp3k5kqu3b4-475713312881.us-west1.run.app"

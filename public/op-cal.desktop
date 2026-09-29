@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=OP-CAL Field Calendar
+GenericName=Tactical Calendar & Scheduler
+Comment=Teenage Engineering styled calendar synthesizer with dual Google & Apple calendar sync
+Exec=google-chrome --app="https://ais-dev-rix33fvhiefnp3k5kqu3b4-475713312881.us-west1.run.app" %U
+Icon=op-cal
+Terminal=false
+Categories=Office;Calendar;Utility;
+Keywords=calendar;scheduler;op-1;teenage-engineering;tasks;events;
+StartupWMClass=op-cal-field
+MimeType=text/calendar;x-scheme-handler/webcal;

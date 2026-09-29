@@ -1,0 +1,105 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --te-case: #e7e5e0;
+    --te-case-dark: #222326;
+    --te-aluminum: #d6d4ce;
+    --te-orange: #ff4c00;
+    --te-cyan: #00d2c4;
+    --te-yellow: #f8c822;
+    --te-magenta: #ff2a70;
+    --te-dark: #121316;
+    --te-lcd: #a7b89e;
+    --te-lcd-text: #1d2719;
+  }
+
+  body {
+    background-color: #121316;
+    color: #e5e5e7;
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    user-select: none;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  /* Custom mechanical scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #1e2024;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #474b54;
+    border-radius: 2px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #ff4c00;
+  }
+}
+
+.font-mono-te {
+  font-family: 'JetBrains Mono', 'Space Mono', monospace;
+}
+
+.font-silkscreen {
+  font-family: 'Silkscreen', monospace;
+}
+
+/* Speaker grille pattern */
+.bg-speaker-grille {
+  background-image: radial-gradient(#1d1f23 20%, transparent 20%);
+  background-size: 6px 6px;
+}
+
+.bg-dot-matrix {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 0);
+  background-size: 16px 16px;
+}
+
+/* Mechanical knurling & ridges */
+.ridge-horizontal {
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.15),
+    rgba(0, 0, 0, 0.15) 2px,
+    transparent 2px,
+    transparent 4px
+  );
+}
+
+.ridge-vertical {
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.04),
+    rgba(255, 255, 255, 0.04) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+}
+
+/* LCD screen scanlines & glow */
+.lcd-screen {
+  background-color: #9cb195;
+  color: #1a2717;
+  box-shadow: inset 0 3px 6px rgba(0,0,0,0.35), inset 0 0 20px rgba(0,0,0,0.15);
+  position: relative;
+}
+
+.lcd-screen::after {
+  content: " ";
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.07) 50%);
+  background-size: 100% 4px;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+.oled-screen {
+  background-color: #0a0b0d;
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.8);
+  border: 1px solid #23272e;
+}

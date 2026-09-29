@@ -1,0 +1,21 @@
+{
+  "id": "/",
+  "name": "OP-CAL // Field Calendar Synthesizer",
+  "short_name": "OP-CAL",
+  "description": "Tactical Teenage Engineering inspired calendar synthesizer with dual Google and Apple Calendar sync.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#101114",
+  "theme_color": "#181a1f",
+  "categories": ["utilities", "productivity"],
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
