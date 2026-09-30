@@ -13,6 +13,8 @@ interface EventModalProps {
   onSave: (eventData: Partial<TEEvent> & { summary: string; start: { dateTime?: string; date?: string }; end: { dateTime?: string; date?: string }; reminders: CustomReminder[] }) => Promise<void>;
   onDelete?: (id: string) => Promise<void>;
   isSaving: boolean;
+  isGoogleConnected?: boolean;
+  onConnectGoogle?: () => void;
 }
 
 const PRESET_LEAD_TIMES = [
@@ -55,6 +57,8 @@ export const TEEventModal: React.FC<EventModalProps> = ({
   onSave,
   onDelete,
   isSaving,
+  isGoogleConnected = false,
+  onConnectGoogle,
 }) => {
   const defaultDate = selectedDate || new Date();
   const formatDatetimeLocal = (d: Date) => {
@@ -232,9 +236,23 @@ export const TEEventModal: React.FC<EventModalProps> = ({
             </button>
           </div>
 
-          <span className="text-[9px] font-mono-te text-[#6c717e] hidden sm:inline">
-            DUAL-SYNC ACTIVE
-          </span>
+          <div className="flex items-center gap-2">
+            {isGoogleConnected ? (
+              <span className="text-[9px] font-silkscreen text-[#00d2c4] bg-[#00d2c4]/10 border border-[#00d2c4]/30 px-2 py-0.5 rounded flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#00d2c4] animate-pulse" />
+                SAVING TO GOOGLE CALENDAR
+              </span>
+            ) : (
+              <button
+                type="button"
+                onClick={onConnectGoogle}
+                className="text-[9px] font-silkscreen text-[#ff4c00] hover:text-white bg-[#ff4c00]/15 hover:bg-[#ff4c00] border border-[#ff4c00]/40 px-2 py-0.5 rounded transition-colors flex items-center gap-1"
+                title="Sign in to save this event directly to your Google Account"
+              >
+                <span>+ SYNC TO GOOGLE ACCOUNT</span>
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Form Body */}
@@ -583,7 +601,11 @@ export const TEEventModal: React.FC<EventModalProps> = ({
                 ) : (
                   <>
                     <Check size={13} />
-                    <span>{event ? 'SAVE CHANGES' : 'CREATE EVENT'}</span>
+                    <span>
+                      {isGoogleConnected 
+                        ? (event ? 'SAVE TO GOOGLE CALENDAR' : 'SAVE TO GOOGLE CALENDAR') 
+                        : (event ? 'SAVE CHANGES' : 'CREATE EVENT')}
+                    </span>
                   </>
                 )}
               </button>

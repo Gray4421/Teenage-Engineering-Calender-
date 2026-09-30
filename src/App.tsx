@@ -197,10 +197,14 @@ export default function App() {
       if (token) {
         if (selectedEvent?.id && !selectedEvent.id.startsWith('apple-') && !selectedEvent.id.startsWith('evt-')) {
           const updated = await updateGoogleCalendarEvent(token, selectedEvent.id, eventData);
-          setEvents(events.map((e) => (e.id === updated.id ? updated : e)));
+          const nextEvents = events.map((e) => (e.id === updated.id ? updated : e));
+          setEvents(nextEvents);
+          saveLocalCachedEvents(nextEvents);
         } else {
           const created = await createGoogleCalendarEvent(token, eventData);
-          setEvents([created, ...events]);
+          const nextEvents = [created, ...events];
+          setEvents(nextEvents);
+          saveLocalCachedEvents(nextEvents);
         }
       } else {
         if (selectedEvent) {
@@ -385,9 +389,10 @@ export default function App() {
                 onClick={handleGoogleSignIn}
                 disabled={isAuthorizing}
                 className="px-3 py-1.5 rounded bg-[#ff4c00] hover:bg-[#e24400] text-white text-[10px] font-silkscreen tracking-wider flex items-center gap-1.5 shadow-[0_0_12px_rgba(255,76,0,0.3)] transition-all active:scale-95"
+                title="Connect your Google Account to save and sync progress"
               >
                 <Radio size={12} className={isAuthorizing ? 'animate-spin' : ''} />
-                <span>{isAuthorizing ? 'CONNECTING...' : 'SYNC GOOGLE CAL'}</span>
+                <span>{isAuthorizing ? 'CONNECTING...' : 'SAVE PROGRESS WITH GOOGLE ACCOUNT'}</span>
               </button>
               <button
                 onClick={handleManualTokenEntry}
@@ -535,6 +540,8 @@ export default function App() {
           onSave={handleSaveEvent}
           onDelete={selectedEvent ? handleDeleteEvent : undefined}
           isSaving={isSaving}
+          isGoogleConnected={Boolean(token)}
+          onConnectGoogle={handleGoogleSignIn}
         />
       )}
 
